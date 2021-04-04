@@ -1,0 +1,26 @@
+{
+  "name": "audio-to-text",
+  "version": "0.1.0",
+  "description": "Script that uses IBM Watson Speech to Text API to transcribe audio files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veroreinah/audio-to-text.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/veroreinah/audio-to-text/issues"
+  },
+  "homepage": "https://github.com/veroreinah/audio-to-text#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
+    "ibm-watson": "^5.7.1",
+    "mongoose": "^5.10.15",
+    "path": "^0.12.7"
+  }
+}

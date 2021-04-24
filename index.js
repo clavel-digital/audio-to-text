@@ -32,16 +32,22 @@ fs.readdir('./audio/', (err, files) => {
       fs.createReadStream(`audio/${file}`).pipe(recognizeStream);
 
       // Listen for events.
-      recognizeStream.on('data', function(event) { onEvent('Data', event); saveData(file, event); });
-      recognizeStream.on('error', function(event) { onEvent('Error', event); });
-      recognizeStream.on('close', function(event) { onEvent('Close', event); });
+      recognizeStream.on('data', function(event) { onEvent('Data', event, file); saveData(file, event); });
+      recognizeStream.on('error', function(event) { onEvent('Error', event, file); });
+      recognizeStream.on('close', function(event) { onEvent('Close', event, file); });
     }
   });
 });
 
 // Display events on the console.
-function onEvent(name, event) {
-  console.log(name, JSON.stringify(event, null, 2));
+function onEvent(name, event, file) {
+  // console.log(name, JSON.stringify(event, null, 2));
+
+  if (name === 'Error') {
+    console.error(name, file);
+  } else {
+    console.log(name, file);
+  }
 };
 
 function saveData(file, event) {

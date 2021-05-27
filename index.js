@@ -22,20 +22,21 @@ const params = {
   timestamps: true,
 };
 
-fs.readdir('./audio/', (err, files) => {
-  files.forEach(file => {
-    if (path.extname(file) === '.mp3') {
-      // Create the stream.
-      const recognizeStream = speechToText.recognizeUsingWebSocket(params);
+fs.readdir('./audio/', async (err, files) => {
+  const savedFiles = await Transcription.find({});
+  const filesToRecognize = files.filter(file => path.extname(file) === '.mp3' && !savedFiles.some(f => f.file === file));
 
-      // Pipe in the audio.
-      fs.createReadStream(`audio/${file}`).pipe(recognizeStream);
+  filesToRecognize.forEach(file => {
+    // Create the stream.
+    const recognizeStream = speechToText.recognizeUsingWebSocket(params);
 
-      // Listen for events.
-      recognizeStream.on('data', function(event) { onEvent('Data', event, file); saveData(file, event); });
-      recognizeStream.on('error', function(event) { onEvent('Error', event, file); });
-      recognizeStream.on('close', function(event) { onEvent('Close', event, file); });
-    }
+    // Pipe in the audio.
+    fs.createReadStream(`audio/${file}`).pipe(recognizeStream);
+
+    // Listen for events.
+    recognizeStream.on('data', function(event) { onEvent('Data', event, file); saveData(file, event); });
+    recognizeStream.on('error', function(event) { onEvent('Error', event, file); });
+    recognizeStream.on('close', function(event) { onEvent('Close', event, file); });
   });
 });
 

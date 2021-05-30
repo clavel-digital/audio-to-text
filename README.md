@@ -16,6 +16,10 @@ For each audio, it will generate a Mongo document with the attributes:
 - `file`, the name of the audio file. 
 - `transcription`, an array of objects with the properties word (the transcribed word), start and end (when the word started in the audio file and when it ended).
 
+### Errors handling
+
+If trying to get the transcription of a specific audio throws an **error**, the audio will be moved to the `errors` folder in the root of this project. A JSON file with the error log will be saved in the same folder.
+
 ## Requirements
 
 The following environment variables must be defined:

@@ -31,7 +31,7 @@ fs.readdir('./audio/', async (err, files) => {
     const recognizeStream = speechToText.recognizeUsingWebSocket(params);
 
     // Pipe in the audio.
-    fs.createReadStream(`audio/${file}`).pipe(recognizeStream);
+    fs.createReadStream(`./audio/${file}`).pipe(recognizeStream);
 
     // Listen for events.
     recognizeStream.on('data', function(event) { onEvent('Data', event, file); saveData(file, event); });
@@ -42,12 +42,20 @@ fs.readdir('./audio/', async (err, files) => {
 
 // Display events on the console.
 function onEvent(name, event, file) {
-  // console.log(name, JSON.stringify(event, null, 2));
-
+  console.log(name, file);
+  
   if (name === 'Error') {
-    console.error(name, file);
-  } else {
-    console.log(name, file);
+    const errorsDir = './errors';
+    if (!fs.existsSync(errorsDir)) {
+      try {
+        fs.mkdirSync(errorsDir);
+      } catch (err) {
+        console.error(`Error while creating ${errorsDir}.`);
+      }
+    }
+
+    fs.renameSync(`audio/${file}`, `${errorsDir}/${file}`);
+    fs.writeFileSync(`${errorsDir}/${file.replace('.mp3', '.json')}`, JSON.stringify(event, null, 2));
   }
 };
 

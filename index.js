@@ -1,10 +1,14 @@
 require("dotenv").config();
 require("./connect-db");
+const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const { IamAuthenticator } = require('ibm-watson/auth');
 const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
 const Transcription = require('./models/Transcription');
+
+let totalFiles = 0;
+let closedFiles = 0;
 
 const speechToText = new SpeechToTextV1({
   authenticator: new IamAuthenticator({
@@ -25,6 +29,7 @@ const params = {
 fs.readdir('./audio/', async (err, files) => {
   const savedFiles = await Transcription.find({});
   const filesToRecognize = files.filter(file => path.extname(file) === '.mp3' && !savedFiles.some(f => f.file === file));
+  totalFiles = filesToRecognize.length;
 
   filesToRecognize.forEach(file => {
     // Create the stream.
@@ -43,7 +48,7 @@ fs.readdir('./audio/', async (err, files) => {
 // Display events on the console.
 function onEvent(name, event, file) {
   console.log(name, file);
-  
+
   if (name === 'Error') {
     const errorsDir = './errors';
     if (!fs.existsSync(errorsDir)) {
@@ -57,9 +62,19 @@ function onEvent(name, event, file) {
     fs.renameSync(`audio/${file}`, `${errorsDir}/${file}`);
     fs.writeFileSync(`${errorsDir}/${file.replace('.mp3', '.json')}`, JSON.stringify(event, null, 2));
   }
+
+  if (name === 'Close') {
+    closedFiles++;
+    console.log(`✨ ${closedFiles}/${totalFiles}`);
+
+    if (closedFiles === totalFiles) {
+      console.log('Disconnect');
+      mongoose.disconnect();
+    }
+  }
 };
 
-function saveData(file, event) {
+async function saveData(file, event) {
   let transcription = [];
 
   event.results.forEach(result => {
@@ -78,5 +93,6 @@ function saveData(file, event) {
     transcription
   });
 
-  newTranscription.save();
+  await newTranscription.save();
+  console.log('Saved', file);
 }

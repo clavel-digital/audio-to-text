@@ -24,6 +24,7 @@ const params = {
   keywords: ['reina', 'museo', 'arte'],
   keywordsThreshold: 0.5,
   timestamps: true,
+  // inactivityTimeout: -1 // The time in seconds after which, if only silence (no speech) is detected in the audio, the connection is closed.
 };
 
 fs.readdir('./audio/', async (err, files) => {
@@ -49,21 +50,21 @@ fs.readdir('./audio/', async (err, files) => {
 function onEvent(name, event, file) {
   console.log(name, file);
 
-  if (name === 'Error') {
-    const errorsDir = './errors';
-    if (!fs.existsSync(errorsDir)) {
+  if (name !== 'Close') {
+    const dir = name === 'Error' ? './errors' : './done';
+    if (!fs.existsSync(dir)) {
       try {
-        fs.mkdirSync(errorsDir);
+        fs.mkdirSync(dir);
       } catch (err) {
-        console.error(`Error while creating ${errorsDir}.`);
+        console.error(`Error while creating ${dir}.`);
       }
     }
 
-    fs.renameSync(`audio/${file}`, `${errorsDir}/${file}`);
-    fs.writeFileSync(`${errorsDir}/${file.replace('.mp3', '.json')}`, JSON.stringify(event, null, 2));
-  }
-
-  if (name === 'Close') {
+    fs.renameSync(`audio/${file}`, `${dir}/${file}`);
+    if (name === 'Error') {
+      fs.writeFileSync(`${dir}/${file.replace('.mp3', '.json')}`, JSON.stringify(event, null, 2));
+    }
+  } else {
     closedFiles++;
     console.log(`✨ ${closedFiles}/${totalFiles}`);
 

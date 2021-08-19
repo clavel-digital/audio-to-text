@@ -3,6 +3,7 @@
 # Project directories
 audio/
 errors/
+done/
 
 # Dependency directories
 node_modules/

@@ -1,4 +1,4 @@
-# audio-to-text (WIP)
+# audio-to-text
 
 Node script that uses IBM Watson Speech to Text API to transcribe audio files.
 
@@ -15,6 +15,8 @@ For each audio, it will generate a Mongo document with the attributes:
 
 - `file`, the name of the audio file. 
 - `transcription`, an array of objects with the properties word (the transcribed word), start and end (when the word started in the audio file and when it ended).
+
+Once the transcription of each file is saved, it will be moved to the `done` directory in the root of this project.
 
 ### Errors handling
 

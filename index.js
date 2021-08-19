@@ -24,7 +24,7 @@ const params = {
   keywords: ['reina', 'museo', 'arte'],
   keywordsThreshold: 0.5,
   timestamps: true,
-  // inactivityTimeout: -1 // The time in seconds after which, if only silence (no speech) is detected in the audio, the connection is closed.
+  inactivityTimeout: -1 // The time in seconds after which, if only silence (no speech) is detected in the audio, the connection is closed.
 };
 
 fs.readdir('./audio/', async (err, files) => {
